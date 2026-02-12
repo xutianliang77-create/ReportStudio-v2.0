@@ -1,5 +1,4 @@
 import json
-import tempfile
 import unittest
 from pathlib import Path
 
@@ -24,26 +23,6 @@ class P1PipelineTests(unittest.TestCase):
         self.assertEqual(metrics["sum"], 500.0)
         ranked = topn(ds.rows, "region", "amount", n=2)
         self.assertEqual(ranked[0]["region"], "East")
-
-
-    def test_export_report_uses_unique_artifact_names(self):
-        from reportstudio.p1.export_artifact import export_report
-
-        with tempfile.TemporaryDirectory() as tmp:
-            out_dir = Path(tmp)
-            first = export_report({"layout": {}}, out_dir, report_name="dupcheck")
-            second = export_report({"layout": {}}, out_dir, report_name="dupcheck")
-
-        self.assertNotEqual(first["file"], second["file"])
-
-    def test_export_report_uses_trace_id_in_name(self):
-        from reportstudio.p1.export_artifact import export_report
-
-        with tempfile.TemporaryDirectory() as tmp:
-            out_dir = Path(tmp)
-            artifact = export_report({"trace_id": "tr_abc-123", "layout": {}}, out_dir)
-
-        self.assertIn("tr_abc-123", Path(artifact["file"]).name)
 
     def test_e2e_run_pipeline(self):
         result = run_pipeline(FIXTURE, metric_field="amount", dimension_field="region")

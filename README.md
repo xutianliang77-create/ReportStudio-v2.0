@@ -7,7 +7,7 @@ OpenClaw 的企业级报表 Skill 仓库（ReportStudio v2.0）。
 - `AGENTS.md`：仓库协作规则与变更同步要求。
 - `CODEx_TODO.md`：当前交付与下一步实现任务清单。
 - `openclaw-report-dev/`：可分发的 Skill 内容（SKILL.md / references / assets）。
-- `reportstudio/`：技术实现脚手架（intent 路由、入口脚本占位）。
+- `reportstudio/`：技术实现脚手架（intent 路由、P1 基础实现、入口脚本）。
 - `tests/`：基础单元测试（当前覆盖 intent 路由行为）。
 
 ## Skill references
@@ -30,4 +30,5 @@ zip -r openclaw-report-dev.skill openclaw-report-dev
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
+python3 reportstudio/scripts/report/create.py --input tests/fixtures/sales.csv --metric-field amount --dimension-field region
 ```
