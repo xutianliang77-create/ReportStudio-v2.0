@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from reportstudio.api.deps import acl_error_response, enforce_acl
+from reportstudio.core.export.artifact_service import ExportDocxError, export_docx_artifact
 from reportstudio.api.deps import acl_error_response, enforce_acl
 from reportstudio.core.render.job_service import (
     cancel_job,
@@ -33,6 +37,28 @@ def create_render(
     headers: dict[str, str] | None = None,
     principal_id: str = "owner",
 ) -> dict:
+
+  # 1️⃣ 先校验 format
+if fmt not in {"pdf", "xlsx", "json", "docx"}:
+    return {
+        "code": 400,
+        "message": "unsupported format",
+        "error_code": "E3003",
+        "data": {},
+    }
+
+# 2️⃣ 再做 ACL 校验
+try:
+    enforce_acl(
+        resource_type="report",
+        resource_id=report_id,
+        principal_type="user",
+        principal_id=principal_id,
+        action="export",
+    )
+except Exception as e:
+    return acl_error_response(e)
+  main
     try:
         enforce_acl(
             resource_type="report",
@@ -71,6 +97,50 @@ def create_render(
     }
 
 
+def export_render_docx(
+    render_id: str,
+    *,
+    intermediate_dir: str,
+    principal_id: str = "owner",
+    title: str = "Report",
+) -> dict:
+    job = get_job(render_id)
+    try:
+        enforce_acl(
+            resource_type="report",
+            resource_id=job.report_id,
+            principal_id=principal_id,
+            actions_any={"export"},
+        )
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
+    try:
+        artifact = export_docx_artifact(
+            render_id=render_id,
+            intermediate_dir=Path(intermediate_dir),
+            # ✅ 不要写死 repo 内路径，避免云环境/容器路径不存在
+            out_dir=Path(intermediate_dir) / "_exports",
+            title=title,
+        )
+        return {
+            "code": 200,
+            "message": "success",
+            "data": {
+                "artifact": artifact,
+            },
+        }
+    except ExportDocxError as exc:
+        return {
+            "code": 400,
+            "message": str(exc),
+            "error_code": "E3003",
+            "data": {
+                "render_id": render_id,
+            },
+        }
+
+
 def cancel_render(render_id: str) -> dict:
     job = cancel_job(render_id)
     return {
@@ -83,7 +153,6 @@ def cancel_render(render_id: str) -> dict:
             }
         },
     }
-
 
 def retry_render(
     render_id: str,
