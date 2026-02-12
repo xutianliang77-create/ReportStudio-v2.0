@@ -1,4 +1,4 @@
-"""Storage model placeholders for render jobs and templates.
+"""Storage model placeholders for render jobs, templates, and report versions.
 
 This scaffold does not persist DB rows yet; fields mirror migration intent.
 """
@@ -45,7 +45,18 @@ class TemplateVersionModel:
     changelog: str | None = None
 
 
+@dataclass
+class ReportVersionModel:
+    version_id: str
+    report_id: str
+    version_no: int
+    spec_json: dict[str, Any]
+    created_at: str
+
+
 # Intended DB constraints (for SQLAlchemy/Alembic-backed deployments):
 # UNIQUE(workspace_id, report_id, render_request_id)
 # UNIQUE(template_id, version)
 # INDEX(template_id, latest_version)
+# UNIQUE(report_id, version_no)
+# UNIQUE(version_id)

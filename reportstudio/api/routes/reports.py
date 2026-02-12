@@ -1,0 +1,82 @@
+"""/reports route handlers for report version snapshots."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+from reportstudio.core.version.service import (
+    commit_report_version,
+    create_report,
+    get_report_version,
+    list_report_versions,
+    report_to_dict,
+    report_version_to_dict,
+    update_report_spec,
+)
+
+
+@dataclass(frozen=True)
+class CreateReportDTO:
+    name: str
+    spec: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class CommitReportVersionDTO:
+    spec: dict[str, Any] | None = None
+
+
+def create_report_route(payload: CreateReportDTO) -> dict:
+    report = create_report(name=payload.name, spec=payload.spec)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "report": report_to_dict(report),
+        },
+    }
+
+
+def update_report_spec_route(report_id: str, spec: dict[str, Any]) -> dict:
+    report = update_report_spec(report_id, spec)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "report": report_to_dict(report),
+        },
+    }
+
+
+def commit_report_version_route(report_id: str, payload: CommitReportVersionDTO) -> dict:
+    version = commit_report_version(report_id=report_id, spec=payload.spec)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "version": report_version_to_dict(version),
+        },
+    }
+
+
+def list_report_versions_route(report_id: str) -> dict:
+    versions = [report_version_to_dict(v) for v in list_report_versions(report_id)]
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "versions": versions,
+        },
+    }
+
+
+def get_report_version_route(report_id: str, version_id: str) -> dict:
+    version = get_report_version(report_id, version_id)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "version": report_version_to_dict(version),
+        },
+    }
