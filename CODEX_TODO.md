@@ -1,5 +1,5 @@
 # CODEx TODO
 
-- [x] Bootstrap package structure.
-- [x] Implement a simple report generator.
-- [x] Add test coverage for happy-path and edge-case behavior.
+- [x] Define typed models for OpenClaw skill content.
+- [x] Implement SKILL.md rendering utilities.
+- [x] Add tests for required sections and output formatting.

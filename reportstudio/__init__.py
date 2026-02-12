@@ -1,5 +1,10 @@
-"""ReportStudio core package."""
+"""Helpers for building OpenClaw skill documents."""
 
-from .report import build_sales_report, summarize_sales
+from .skill import SkillExample, SkillSpec, render_skill_markdown, render_skill_package
 
-__all__ = ["summarize_sales", "build_sales_report"]
+__all__ = [
+    "SkillExample",
+    "SkillSpec",
+    "render_skill_markdown",
+    "render_skill_package",
+]
