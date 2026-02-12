@@ -1,4 +1,4 @@
-"""Storage model placeholders for render jobs.
+"""Storage model placeholders for render jobs and templates.
 
 This scaffold does not persist DB rows yet; fields mirror migration intent.
 """
@@ -6,6 +6,7 @@ This scaffold does not persist DB rows yet; fields mirror migration intent.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -27,5 +28,24 @@ class RenderJobModel:
     error_message: str | None = None
 
 
-# Intended DB constraint (for SQLAlchemy/Alembic-backed deployments):
+@dataclass
+class TemplateModel:
+    template_id: str
+    name: str
+    description: str | None = None
+    status: str = "active"
+    latest_version: int = 1
+
+
+@dataclass
+class TemplateVersionModel:
+    template_id: str
+    version: int
+    spec_json: dict[str, Any] | None = None
+    changelog: str | None = None
+
+
+# Intended DB constraints (for SQLAlchemy/Alembic-backed deployments):
 # UNIQUE(workspace_id, report_id, render_request_id)
+# UNIQUE(template_id, version)
+# INDEX(template_id, latest_version)
