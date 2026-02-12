@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from reportstudio.api.deps import acl_error_response, enforce_acl
+from reportstudio.core.security.acl import ACLDeniedError, set_resource_owner
+from reportstudio.core.version import service as version_service
 from reportstudio.core.version.service import (
     commit_report_version,
     create_report,
@@ -29,8 +32,25 @@ class CommitReportVersionDTO:
     spec: dict[str, Any] | None = None
 
 
-def create_report_route(payload: CreateReportDTO) -> dict:
+def create_report_route(payload: CreateReportDTO, *, principal_id: str = "owner") -> dict:
     report = create_report(name=payload.name, spec=payload.spec)
+    set_resource_owner("report", report.report_id, principal_id)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "report": report_to_dict(report),
+        },
+    }
+
+
+def get_report_route(report_id: str, *, principal_id: str = "owner") -> dict:
+    try:
+        enforce_acl(resource_type="report", resource_id=report_id, principal_id=principal_id, actions_any={"view"})
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
+    report = version_service._REPORTS[report_id]
     return {
         "code": 200,
         "message": "success",

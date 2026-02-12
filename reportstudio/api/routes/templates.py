@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from reportstudio.api.deps import acl_error_response, enforce_acl
+from reportstudio.core.security.acl import ACLDeniedError, set_resource_owner
 from reportstudio.core.template.service import (
     TemplateSpec,
     create_template,
@@ -45,8 +47,9 @@ class CreateTemplateVersionDTO:
     changelog: str | None = None
 
 
-def create_template_route(payload: CreateTemplateDTO) -> dict:
+def create_template_route(payload: CreateTemplateDTO, *, principal_id: str = "owner") -> dict:
     template, version = create_template(name=payload.name, description=payload.description, spec=payload.spec.to_domain())
+    set_resource_owner("template", template.template_id, principal_id)
     return {
         "code": 200,
         "message": "success",
@@ -57,7 +60,17 @@ def create_template_route(payload: CreateTemplateDTO) -> dict:
     }
 
 
-def get_template_route(template_id: str) -> dict:
+def get_template_route(template_id: str, *, principal_id: str = "owner") -> dict:
+    try:
+        enforce_acl(
+            resource_type="template",
+            resource_id=template_id,
+            principal_id=principal_id,
+            actions_any={"edit", "manage"},
+        )
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
     template, latest = get_template(template_id)
     return {
         "code": 200,
@@ -68,7 +81,17 @@ def get_template_route(template_id: str) -> dict:
     }
 
 
-def create_template_version_route(template_id: str, payload: CreateTemplateVersionDTO) -> dict:
+def create_template_version_route(template_id: str, payload: CreateTemplateVersionDTO, *, principal_id: str = "owner") -> dict:
+    try:
+        enforce_acl(
+            resource_type="template",
+            resource_id=template_id,
+            principal_id=principal_id,
+            actions_any={"edit", "manage"},
+        )
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
     version = create_template_version(template_id=template_id, spec=payload.spec.to_domain(), changelog=payload.changelog)
     return {
         "code": 200,
@@ -79,7 +102,17 @@ def create_template_version_route(template_id: str, payload: CreateTemplateVersi
     }
 
 
-def list_template_versions_route(template_id: str) -> dict:
+def list_template_versions_route(template_id: str, *, principal_id: str = "owner") -> dict:
+    try:
+        enforce_acl(
+            resource_type="template",
+            resource_id=template_id,
+            principal_id=principal_id,
+            actions_any={"edit", "manage"},
+        )
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
     versions = [version_to_dict(v) for v in list_template_versions(template_id)]
     return {
         "code": 200,

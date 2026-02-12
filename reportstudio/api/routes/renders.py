@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from reportstudio.api.deps import acl_error_response, enforce_acl
 from reportstudio.core.render.job_service import (
     cancel_job,
     create_job,
@@ -9,6 +10,7 @@ from reportstudio.core.render.job_service import (
     job_to_dict,
     retry_failed_job,
 )
+from reportstudio.core.security.acl import ACLDeniedError
 from reportstudio.workers.queue import enqueue_render_job, queue_backend
 
 
@@ -29,7 +31,18 @@ def create_render(
     report_id: str = "default-report",
     render_request_id: str | None = None,
     headers: dict[str, str] | None = None,
+    principal_id: str = "owner",
 ) -> dict:
+    try:
+        enforce_acl(
+            resource_type="report",
+            resource_id=report_id,
+            principal_id=principal_id,
+            actions_any={"view", "render"},
+        )
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
     request_id = _resolve_render_request_id(render_request_id, headers)
     job, created = create_job(
         input_path=input_path,

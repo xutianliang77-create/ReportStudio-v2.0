@@ -65,6 +65,15 @@ class PreviewSessionModel:
     updated_at: str = ""
 
 
+@dataclass
+class ACLPolicyModel:
+    resource_type: str
+    resource_id: str
+    principal_type: str
+    principal_id: str
+    actions_json: list[str]
+
+
 # Intended DB constraints (for SQLAlchemy/Alembic-backed deployments):
 # UNIQUE(workspace_id, report_id, render_request_id)
 # UNIQUE(template_id, version)
@@ -74,3 +83,5 @@ class PreviewSessionModel:
 
 # UNIQUE(preview_session_id)
 # INDEX(report_id, updated_at)
+
+# UNIQUE(resource_type, resource_id, principal_type, principal_id)
