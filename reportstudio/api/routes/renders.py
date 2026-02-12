@@ -1,12 +1,10 @@
 """/renders route handler (P2-001 async queue model)."""
-
 from __future__ import annotations
 
 from pathlib import Path
 
 from reportstudio.api.deps import acl_error_response, enforce_acl
 from reportstudio.core.export.artifact_service import ExportDocxError, export_docx_artifact
-from reportstudio.api.deps import acl_error_response, enforce_acl
 from reportstudio.core.render.job_service import (
     cancel_job,
     create_job,
@@ -37,28 +35,16 @@ def create_render(
     headers: dict[str, str] | None = None,
     principal_id: str = "owner",
 ) -> dict:
+    # 1️⃣ 先校验 format
+    if fmt not in {"pdf", "xlsx", "json", "docx"}:
+        return {
+            "code": 400,
+            "message": "unsupported format",
+            "error_code": "E3003",
+            "data": {},
+        }
 
-  # 1️⃣ 先校验 format
-if fmt not in {"pdf", "xlsx", "json", "docx"}:
-    return {
-        "code": 400,
-        "message": "unsupported format",
-        "error_code": "E3003",
-        "data": {},
-    }
-
-# 2️⃣ 再做 ACL 校验
-try:
-    enforce_acl(
-        resource_type="report",
-        resource_id=report_id,
-        principal_type="user",
-        principal_id=principal_id,
-        action="export",
-    )
-except Exception as e:
-    return acl_error_response(e)
-  main
+    # 2️⃣ 再做 ACL 校验
     try:
         enforce_acl(
             resource_type="report",
@@ -81,7 +67,6 @@ except Exception as e:
     )
     if created:
         enqueue_render_job(job.render_id)
-
     # P1 response compatibility: keep code/message/data envelope, add render_id/status/backend
     return {
         "code": 200,
@@ -153,6 +138,7 @@ def cancel_render(render_id: str) -> dict:
             }
         },
     }
+
 
 def retry_render(
     render_id: str,
