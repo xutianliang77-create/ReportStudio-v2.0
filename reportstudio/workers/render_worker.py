@@ -27,6 +27,10 @@ def _set_progress(render_id: str, status: str, stage: str, progress: int) -> Non
 
 def process_render_job(render_id: str) -> dict:
     job = get_job(render_id)
+    if job.status == "canceled":
+        append_audit_log(render_id, "render.skip_canceled", {"status": "canceled"})
+        return {"render_id": render_id, "status": "canceled"}
+
     _set_progress(render_id, status="running", stage=STAGE_COMPUTE, progress=10)
 
     try:

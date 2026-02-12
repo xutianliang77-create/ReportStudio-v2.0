@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from reportstudio.core.render.job_service import create_job, get_job, job_to_dict
+from reportstudio.core.render.job_service import (
+    cancel_job,
+    create_job,
+    get_job,
+    job_to_dict,
+    retry_failed_job,
+)
 from reportstudio.workers.queue import enqueue_render_job, queue_backend
 
 
@@ -47,6 +53,52 @@ def create_render(
                 "status": job.status,
                 "format": job.fmt,
                 "backend": queue_backend(),
+            }
+        },
+    }
+
+
+def cancel_render(render_id: str) -> dict:
+    job = cancel_job(render_id)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "render": {
+                "render_id": job.render_id,
+                "status": job.status,
+            }
+        },
+    }
+
+
+def retry_render(
+    render_id: str,
+    *,
+    input_path: str | None = None,
+    fmt: str | None = None,
+    metric_field: str | None = None,
+    dimension_field: str | None = None,
+) -> dict:
+    retry_job = retry_failed_job(
+        render_id,
+        input_path=input_path,
+        fmt=fmt,
+        metric_field=metric_field,
+        dimension_field=dimension_field,
+    )
+    enqueue_render_job(retry_job.render_id)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "render": {
+                "render_id": retry_job.render_id,
+                "status": retry_job.status,
+                "format": retry_job.fmt,
+                "backend": queue_backend(),
+                "source_render_id": retry_job.source_render_id,
+                "attempt": retry_job.attempt,
             }
         },
     }

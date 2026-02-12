@@ -13,6 +13,10 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _new_render_id() -> str:
+    return f"rj_{uuid.uuid4().hex[:12]}"
+
+
 @dataclass
 class RenderJob:
     render_id: str
@@ -24,6 +28,8 @@ class RenderJob:
     workspace_id: str
     report_id: str
     render_request_id: str | None = None
+    source_render_id: str | None = None
+    attempt: int = 1
     # P2-002 progress tracking
     progress: int = 0
     stage: str = "queued"
@@ -39,6 +45,41 @@ _JOBS: dict[str, RenderJob] = {}
 _AUDIT_LOGS: list[dict[str, Any]] = []
 _IDEMPOTENCY_INDEX: dict[tuple[str, str, str], str] = {}
 _LOCK = Lock()
+
+
+def _build_job(
+    *,
+    input_path: str,
+    fmt: str,
+    metric_field: str,
+    dimension_field: str,
+    workspace_id: str,
+    report_id: str,
+    render_request_id: str | None,
+    source_render_id: str | None,
+    attempt: int,
+) -> RenderJob:
+    render_id = _new_render_id()
+    ts = _now()
+    job = RenderJob(
+        render_id=render_id,
+        status="queued",
+        input_path=input_path,
+        fmt=fmt,
+        metric_field=metric_field,
+        dimension_field=dimension_field,
+        workspace_id=workspace_id,
+        report_id=report_id,
+        render_request_id=render_request_id,
+        source_render_id=source_render_id,
+        attempt=attempt,
+        progress=0,
+        stage="queued",
+        created_at=ts,
+        updated_at=ts,
+    )
+    _JOBS[render_id] = job
+    return job
 
 
 def create_job(
@@ -72,11 +113,7 @@ def create_job(
                 )
                 return hit, False
 
-            render_id = f"rj_{uuid.uuid4().hex[:12]}"
-            ts = _now()
-            job = RenderJob(
-                render_id=render_id,
-                status="queued",
+            job = _build_job(
                 input_path=input_path,
                 fmt=fmt,
                 metric_field=metric_field,
@@ -84,20 +121,12 @@ def create_job(
                 workspace_id=workspace_id,
                 report_id=report_id,
                 render_request_id=render_request_id,
-                progress=0,
-                stage="queued",
-                created_at=ts,
-                updated_at=ts,
+                source_render_id=None,
+                attempt=1,
             )
-            _JOBS[render_id] = job
-            _IDEMPOTENCY_INDEX[key] = render_id
-
+            _IDEMPOTENCY_INDEX[key] = job.render_id
     else:
-        render_id = f"rj_{uuid.uuid4().hex[:12]}"
-        ts = _now()
-        job = RenderJob(
-            render_id=render_id,
-            status="queued",
+        job = _build_job(
             input_path=input_path,
             fmt=fmt,
             metric_field=metric_field,
@@ -105,12 +134,9 @@ def create_job(
             workspace_id=workspace_id,
             report_id=report_id,
             render_request_id=None,
-            progress=0,
-            stage="queued",
-            created_at=ts,
-            updated_at=ts,
+            source_render_id=None,
+            attempt=1,
         )
-        _JOBS[render_id] = job
 
     append_audit_log(
         job.render_id,
@@ -123,9 +149,69 @@ def create_job(
             "workspace_id": workspace_id,
             "report_id": report_id,
             "render_request_id": render_request_id,
+            "source_render_id": job.source_render_id,
+            "attempt": job.attempt,
         },
     )
     return job, True
+
+
+def cancel_job(render_id: str) -> RenderJob:
+    job = get_job(render_id)
+    if job.status != "queued":
+        raise ValueError("only queued job can be canceled")
+    canceled = update_job(render_id, status="canceled", stage="canceled")
+    append_audit_log(canceled.render_id, "render.cancel", {"status": canceled.status, "stage": canceled.stage})
+    return canceled
+
+
+def retry_failed_job(
+    render_id: str,
+    *,
+    input_path: str | None = None,
+    fmt: str | None = None,
+    metric_field: str | None = None,
+    dimension_field: str | None = None,
+) -> RenderJob:
+    source = get_job(render_id)
+    if source.status != "failed":
+        raise ValueError("only failed job can be retried")
+
+    retry_job = _build_job(
+        input_path=input_path or source.input_path,
+        fmt=fmt or source.fmt,
+        metric_field=metric_field or source.metric_field,
+        dimension_field=dimension_field or source.dimension_field,
+        workspace_id=source.workspace_id,
+        report_id=source.report_id,
+        render_request_id=None,
+        source_render_id=source.render_id,
+        attempt=source.attempt + 1,
+    )
+    append_audit_log(
+        retry_job.render_id,
+        "render.retry",
+        {
+            "source_render_id": source.render_id,
+            "attempt": retry_job.attempt,
+        },
+    )
+    append_audit_log(
+        retry_job.render_id,
+        "queued",
+        {
+            "fmt": retry_job.fmt,
+            "input_path": retry_job.input_path,
+            "progress": 0,
+            "stage": "queued",
+            "workspace_id": retry_job.workspace_id,
+            "report_id": retry_job.report_id,
+            "render_request_id": retry_job.render_request_id,
+            "source_render_id": retry_job.source_render_id,
+            "attempt": retry_job.attempt,
+        },
+    )
+    return retry_job
 
 
 def get_job(render_id: str) -> RenderJob:
