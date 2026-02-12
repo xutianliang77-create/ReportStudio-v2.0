@@ -58,7 +58,6 @@ try:
     )
 except Exception as e:
     return acl_error_response(e)
-  main
     try:
         enforce_acl(
             resource_type="report",
