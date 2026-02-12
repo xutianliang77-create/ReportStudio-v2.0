@@ -14,7 +14,7 @@ def compute_metrics(rows: list[dict], metric_field: str) -> dict:
 
 
 def groupby_sum(rows: list[dict], dimension: str, metric_field: str) -> list[dict]:
-    agg = defaultdict(float)
+    agg: defaultdict[str, float] = defaultdict(float)
     for r in rows:
         key = r.get(dimension, "")
         value = float(r.get(metric_field, 0) or 0)

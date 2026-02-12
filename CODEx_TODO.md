@@ -18,4 +18,4 @@
 - [ ] Upgrade ingest to support XLSX/Markdown and encoding fallback.
 - [ ] Add DSL parser/validator in `reportstudio/scripts/metrics/`.
 - [x] Replace JSON export placeholder with PDF/XLSX concrete exporters.
-- [ ] Add CI workflow for unit tests and lint checks.
+- [x] Add CI workflow for unit tests and lint checks.
