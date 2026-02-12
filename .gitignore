@@ -1,0 +1,9 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# packaged skill artifacts
+*.skill
+
+# local generated report data
+reportstudio/data/
