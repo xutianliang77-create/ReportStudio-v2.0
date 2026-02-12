@@ -6,6 +6,7 @@ from pathlib import Path
 
 from reportstudio.api.deps import acl_error_response, enforce_acl
 from reportstudio.core.export.artifact_service import ExportDocxError, export_docx_artifact
+from reportstudio.api.deps import acl_error_response, enforce_acl
 from reportstudio.core.render.job_service import (
     cancel_job,
     create_job,
@@ -36,13 +37,28 @@ def create_render(
     headers: dict[str, str] | None = None,
     principal_id: str = "owner",
 ) -> dict:
-    if fmt not in {"pdf", "xlsx", "json", "docx"}:
-        return {
-            "code": 400,
-            "message": "unsupported format",
-            "error_code": "E3003",
-            "data": {},
-        }
+
+  # 1️⃣ 先校验 format
+if fmt not in {"pdf", "xlsx", "json", "docx"}:
+    return {
+        "code": 400,
+        "message": "unsupported format",
+        "error_code": "E3003",
+        "data": {},
+    }
+
+# 2️⃣ 再做 ACL 校验
+try:
+    enforce_acl(
+        resource_type="report",
+        resource_id=report_id,
+        principal_type="user",
+        principal_id=principal_id,
+        action="export",
+    )
+except Exception as e:
+    return acl_error_response(e)
+  main
     try:
         enforce_acl(
             resource_type="report",
@@ -103,7 +119,8 @@ def export_render_docx(
         artifact = export_docx_artifact(
             render_id=render_id,
             intermediate_dir=Path(intermediate_dir),
-            out_dir=Path("reportstudio/data/artifacts"),
+            # ✅ 不要写死 repo 内路径，避免云环境/容器路径不存在
+            out_dir=Path(intermediate_dir) / "_exports",
             title=title,
         )
         return {
@@ -136,7 +153,6 @@ def cancel_render(render_id: str) -> dict:
             }
         },
     }
-
 
 def retry_render(
     render_id: str,
