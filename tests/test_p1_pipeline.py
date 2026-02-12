@@ -24,6 +24,16 @@ class P1PipelineTests(unittest.TestCase):
         ranked = topn(ds.rows, "region", "amount", n=2)
         self.assertEqual(ranked[0]["region"], "East")
 
+
+    def test_export_report_uses_unique_artifact_names(self):
+        from reportstudio.p1.export_artifact import export_report
+
+        out_dir = Path("reportstudio/data/artifacts")
+        first = export_report({"layout": {}}, out_dir, report_name="dupcheck")
+        second = export_report({"layout": {}}, out_dir, report_name="dupcheck")
+
+        self.assertNotEqual(first["file"], second["file"])
+
     def test_e2e_run_pipeline(self):
         result = run_pipeline(FIXTURE, metric_field="amount", dimension_field="region")
         self.assertIn("artifact", result)

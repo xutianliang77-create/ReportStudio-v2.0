@@ -6,12 +6,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 import json
 import hashlib
+import uuid
 
 
 def export_report(snapshot: dict, out_dir: Path, report_name: str = "report") -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-    file_name = f"{report_name}_{stamp}.json"
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
+    file_name = f"{report_name}_{stamp}_{uuid.uuid4().hex[:8]}.json"
     target = out_dir / file_name
     target.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
     digest = hashlib.sha256(target.read_bytes()).hexdigest()
