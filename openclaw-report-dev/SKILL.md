@@ -57,4 +57,3 @@ description: 为 OpenClaw 生成和迭代 ReportStudio v2.0 企业级报表方�
 - 验收门禁：`references/report-acceptance-checklist.md`
 - 安全与合规模板：`references/report-security-compliance.md`
 - 标准交付模板：`assets/report-design-spec-template.md`
-- P1 交付状态：`references/report-p1-delivery-status.md`

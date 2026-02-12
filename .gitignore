@@ -4,6 +4,3 @@ __pycache__/
 
 # packaged skill artifacts
 *.skill
-
-# local generated report data
-reportstudio/data/
