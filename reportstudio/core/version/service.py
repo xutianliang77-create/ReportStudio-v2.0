@@ -1,9 +1,11 @@
-"""Report version snapshot service (immutable version records)."""
+"""Report version snapshot service (immutable version records + rollback)."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import hashlib
+import json
 from typing import Any
 import uuid
 
@@ -12,11 +14,17 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _hash_spec(spec: dict[str, Any]) -> str:
+    payload = json.dumps(spec, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 @dataclass
 class Report:
     report_id: str
     name: str
     current_spec: dict[str, Any]
+    current_spec_version_id: str | None
     created_at: str
     updated_at: str
 
@@ -51,6 +59,7 @@ def create_report(*, name: str, spec: dict[str, Any]) -> Report:
         report_id=f"rp_{uuid.uuid4().hex[:12]}",
         name=name,
         current_spec=dict(spec),
+        current_spec_version_id=None,
         created_at=ts,
         updated_at=ts,
     )
@@ -62,6 +71,7 @@ def create_report(*, name: str, spec: dict[str, Any]) -> Report:
 def update_report_spec(report_id: str, spec: dict[str, Any]) -> Report:
     report = _REPORTS[report_id]
     report.current_spec = dict(spec)
+    report.current_spec_version_id = None
     report.updated_at = _now()
     return report
 
@@ -81,6 +91,9 @@ def commit_report_version(*, report_id: str, spec: dict[str, Any] | None = None)
         created_at=_now(),
     )
     versions.append(version)
+    report.current_spec = dict(snapshot)
+    report.current_spec_version_id = version.version_id
+    report.updated_at = _now()
     _append_audit_log(
         "report.version.commit",
         {
@@ -90,6 +103,36 @@ def commit_report_version(*, report_id: str, spec: dict[str, Any] | None = None)
         },
     )
     return version
+
+
+def rollback_report(*, report_id: str, version_id: str) -> Report:
+    report = _REPORTS[report_id]
+    target = get_report_version(report_id, version_id)
+    from_version = report.current_spec_version_id
+    report.current_spec = dict(target.spec_json)
+    report.current_spec_version_id = target.version_id
+    report.updated_at = _now()
+    _append_audit_log(
+        "report.rollback",
+        {
+            "report_id": report_id,
+            "from_version_id": from_version,
+            "to_version_id": target.version_id,
+        },
+    )
+    return report
+
+
+def render_from_current_spec(report_id: str) -> dict[str, Any]:
+    """Scaffold rerender hook that depends on current spec only."""
+
+    report = _REPORTS[report_id]
+    spec_hash = _hash_spec(report.current_spec)
+    return {
+        "report_id": report_id,
+        "spec_hash": spec_hash,
+        "current_spec_version_id": report.current_spec_version_id,
+    }
 
 
 def list_report_versions(report_id: str) -> list[ReportVersion]:
@@ -108,6 +151,7 @@ def report_to_dict(report: Report) -> dict[str, Any]:
         "report_id": report.report_id,
         "name": report.name,
         "spec": report.current_spec,
+        "current_spec_version_id": report.current_spec_version_id,
         "created_at": report.created_at,
         "updated_at": report.updated_at,
     }

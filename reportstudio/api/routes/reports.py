@@ -10,8 +10,10 @@ from reportstudio.core.version.service import (
     create_report,
     get_report_version,
     list_report_versions,
+    render_from_current_spec,
     report_to_dict,
     report_version_to_dict,
+    rollback_report,
     update_report_spec,
 )
 
@@ -56,6 +58,28 @@ def commit_report_version_route(report_id: str, payload: CommitReportVersionDTO)
         "message": "success",
         "data": {
             "version": report_version_to_dict(version),
+        },
+    }
+
+
+def rollback_report_route(report_id: str, *, version_id: str) -> dict:
+    report = rollback_report(report_id=report_id, version_id=version_id)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "report": report_to_dict(report),
+        },
+    }
+
+
+def rerender_report_route(report_id: str) -> dict:
+    payload = render_from_current_spec(report_id)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "render": payload,
         },
     }
 
