@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from reportstudio.core.preview.patch import PreviewPatchError
 from reportstudio.core.preview.service import (
+    apply_preview_patches,
     create_preview_session,
     get_preview_session,
     mark_preview_render,
@@ -20,6 +22,11 @@ class CreatePreviewSessionDTO:
     base_version_id: str | None = None
 
 
+@dataclass(frozen=True)
+class PatchPreviewSessionDTO:
+    patches: list[dict]
+
+
 def create_preview_session_route(payload: CreatePreviewSessionDTO) -> dict:
     session = create_preview_session(report_id=payload.report_id, base_version_id=payload.base_version_id)
     return {
@@ -33,6 +40,28 @@ def create_preview_session_route(payload: CreatePreviewSessionDTO) -> dict:
 
 def get_preview_session_route(preview_session_id: str) -> dict:
     session = get_preview_session(preview_session_id)
+    return {
+        "code": 200,
+        "message": "success",
+        "data": {
+            "preview_session": preview_session_to_dict(session),
+        },
+    }
+
+
+def patch_preview_session_route(preview_session_id: str, payload: PatchPreviewSessionDTO) -> dict:
+    try:
+        session = apply_preview_patches(preview_session_id, payload.patches)
+    except PreviewPatchError as exc:
+        return {
+            "code": 400,
+            "message": str(exc),
+            "error_code": exc.code,
+            "data": {
+                "preview_session_id": preview_session_id,
+            },
+        }
+
     return {
         "code": 200,
         "message": "success",

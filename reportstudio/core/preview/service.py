@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 import uuid
 
+from reportstudio.core.preview.patch import apply_patches
 from reportstudio.core.version.service import get_report_version, list_report_versions
 
 
@@ -88,6 +89,25 @@ def mark_preview_render(preview_session_id: str, render_id: str) -> PreviewSessi
             "preview_session_id": preview_session_id,
             "report_id": session.report_id,
             "render_id": render_id,
+        },
+    )
+    return session
+
+
+def apply_preview_patches(preview_session_id: str, patches: list[dict[str, Any]]) -> PreviewSession:
+    session = get_preview_session(preview_session_id)
+    next_spec = apply_patches(session.working_spec_json, patches)
+    session.working_spec_json = next_spec
+    session.patch_history_json.extend(patches)
+    session.status = "active"
+    session.updated_at = _now()
+    _append_audit_log(
+        "preview.patch",
+        {
+            "preview_session_id": preview_session_id,
+            "report_id": session.report_id,
+            "patch_count": len(patches),
+            "ops": [p.get("op") for p in patches if isinstance(p, dict)],
         },
     )
     return session
