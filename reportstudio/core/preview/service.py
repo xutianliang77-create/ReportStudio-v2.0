@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 import uuid
 
-from reportstudio.core.preview.patch import apply_patches
+from reportstudio.core.preview.replay import replay_patches, spec_hash
 from reportstudio.core.version.service import get_report_version, list_report_versions
 
 
@@ -20,6 +20,7 @@ class PreviewSession:
     preview_session_id: str
     report_id: str
     base_spec_version: str | None
+    base_spec_json: dict[str, Any]
     working_spec_json: dict[str, Any]
     patch_history_json: list[dict[str, Any]]
     status: str
@@ -58,6 +59,7 @@ def create_preview_session(*, report_id: str, base_version_id: str | None = None
         preview_session_id=f"ps_{uuid.uuid4().hex[:12]}",
         report_id=report_id,
         base_spec_version=resolved_version_id,
+        base_spec_json=dict(spec),
         working_spec_json=spec,
         patch_history_json=[],
         status="active",
@@ -96,30 +98,45 @@ def mark_preview_render(preview_session_id: str, render_id: str) -> PreviewSessi
 
 def apply_preview_patches(preview_session_id: str, patches: list[dict[str, Any]]) -> PreviewSession:
     session = get_preview_session(preview_session_id)
-    next_spec = apply_patches(session.working_spec_json, patches)
+    next_history = [*session.patch_history_json, *patches]
+    next_spec = replay_patches(session.base_spec_json, next_history)
+    session.patch_history_json = next_history
     session.working_spec_json = next_spec
-    session.patch_history_json.extend(patches)
     session.status = "active"
     session.updated_at = _now()
+    current_spec_hash = spec_hash(next_spec)
     _append_audit_log(
         "preview.patch",
         {
             "preview_session_id": preview_session_id,
             "report_id": session.report_id,
             "patch_count": len(patches),
+            "patch_history_len": len(next_history),
             "ops": [p.get("op") for p in patches if isinstance(p, dict)],
+            "spec_hash": current_spec_hash,
+        },
+    )
+    _append_audit_log(
+        "preview.replay",
+        {
+            "preview_session_id": preview_session_id,
+            "report_id": session.report_id,
+            "patch_history_len": len(next_history),
+            "spec_hash": current_spec_hash,
         },
     )
     return session
 
 
 def preview_session_to_dict(session: PreviewSession) -> dict[str, Any]:
+    current_spec_hash = spec_hash(session.working_spec_json)
     return {
         "preview_session_id": session.preview_session_id,
         "report_id": session.report_id,
         "base_spec_version": session.base_spec_version,
         "working_spec_json": session.working_spec_json,
         "patch_history_json": session.patch_history_json,
+        "spec_hash": current_spec_hash,
         "status": session.status,
         "updated_at": session.updated_at,
     }
