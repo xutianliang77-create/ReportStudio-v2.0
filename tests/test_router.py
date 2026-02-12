@@ -8,6 +8,7 @@ class RouterTests(unittest.TestCase):
         routes = load_routes()
         self.assertIn("report.create", routes)
         self.assertIn("report.export", routes)
+        self.assertIn("report.download", routes)
         self.assertIn("report.lineage.trace", routes)
 
     def test_resolve_intent_returns_expected_script(self):

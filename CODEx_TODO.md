@@ -8,9 +8,10 @@
 - [x] P1-401 ~ P1-404 Export + Artifact（`reportstudio/p1/export_artifact.py`）
 - [x] P1-501 ~ P1-502 Dispatch & E2E（`reportstudio/p1/dispatch.py`, `reportstudio/scripts/report/create.py`）
 - [x] Added tests for ingest/metrics/e2e pipeline (`tests/test_p1_pipeline.py`)
+- [x] Add dedicated download metadata helper (`reportstudio/scripts/export/download.py`)
 
 ## Next steps
 - [ ] Upgrade ingest to support XLSX/Markdown and encoding fallback.
 - [ ] Add DSL parser/validator in `reportstudio/scripts/metrics/`.
-- [ ] Replace JSON export placeholder with PDF/XLSX concrete exporters.
+- [x] Replace JSON export placeholder with PDF/XLSX concrete exporters.
 - [ ] Add CI workflow for unit tests and lint checks.

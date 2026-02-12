@@ -1,6 +1,6 @@
 # ReportStudio-v2.0
 
-OpenClaw 的企业级报表 Skill 仓库（ReportStudio v2.0）。
+OpenClaw 的企业级报表 Skill 仓库（ReportStudio v2.0），支持报表制作、分析与下载能力建设。
 
 ## Repository map
 

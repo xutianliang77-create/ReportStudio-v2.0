@@ -12,4 +12,9 @@ This folder is a lightweight technical scaffold aligned with the `openclaw-repor
 ```bash
 python3 -m reportstudio.router report.create
 python3 reportstudio/scripts/report/create.py --input tests/fixtures/sales.csv --metric-field amount --dimension-field region
+python3 reportstudio/scripts/export/export.py --input tests/fixtures/sales.csv --metric-field amount --dimension-field region --format json
+python3 reportstudio/scripts/export/export.py --input tests/fixtures/sales.csv --metric-field amount --dimension-field region --format xlsx
+python3 reportstudio/scripts/export/export.py --input tests/fixtures/sales.csv --metric-field amount --dimension-field region --format pdf
+# then use output artifact path with:
+python3 reportstudio/scripts/export/download.py --file <artifact_path>
 ```

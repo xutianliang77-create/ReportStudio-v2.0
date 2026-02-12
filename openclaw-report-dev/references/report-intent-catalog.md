@@ -9,7 +9,8 @@
 - `report.preview.save`
 - `report.update`
 - `report.explain`
-- `report.export`
+- `report.export`（支持 json/xlsx/pdf 导出）
+- `report.download`
 
 ## 模板
 - `report.template.save`
