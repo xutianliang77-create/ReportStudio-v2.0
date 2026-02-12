@@ -54,9 +54,23 @@ class ReportVersionModel:
     created_at: str
 
 
+@dataclass
+class PreviewSessionModel:
+    preview_session_id: str
+    report_id: str
+    base_spec_version: str | None = None
+    working_spec_json: dict[str, Any] | None = None
+    patch_history_json: list[dict[str, Any]] | None = None
+    status: str = "active"
+    updated_at: str = ""
+
+
 # Intended DB constraints (for SQLAlchemy/Alembic-backed deployments):
 # UNIQUE(workspace_id, report_id, render_request_id)
 # UNIQUE(template_id, version)
 # INDEX(template_id, latest_version)
 # UNIQUE(report_id, version_no)
 # UNIQUE(version_id)
+
+# UNIQUE(preview_session_id)
+# INDEX(report_id, updated_at)
