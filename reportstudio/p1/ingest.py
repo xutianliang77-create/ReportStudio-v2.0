@@ -18,17 +18,8 @@ class Dataset:
 
 
 def _read_csv(path: Path) -> list[dict]:
-    # Use utf-8-sig to automatically strip UTF-8 BOM (common in Excel-exported CSVs).
-    with path.open("r", encoding="utf-8-sig", newline="") as f:
-        reader = csv.DictReader(f)
-        if reader.fieldnames:
-            reader.fieldnames = [name.lstrip("\ufeff") if isinstance(name, str) else name for name in reader.fieldnames]
-        return [
-            {(
-                k.lstrip("\ufeff") if isinstance(k, str) else k
-            ): v for k, v in row.items()}
-            for row in reader
-        ]
+    with path.open("r", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
 
 
 def _read_json(path: Path) -> list[dict]:

@@ -31,4 +31,8 @@ zip -r openclaw-report-dev.skill openclaw-report-dev
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 reportstudio/scripts/report/create.py --input tests/fixtures/sales.csv --metric-field amount --dimension-field region
+python3 reportstudio/scripts/preview/serve.py reports.create --input tests/fixtures/sales.csv
+python3 reportstudio/scripts/preview/serve.py renders.create --input tests/fixtures/sales.csv --format pdf
+python3 reportstudio/scripts/preview/serve.py --command "create report" --input tests/fixtures/sales.csv
+python3 reportstudio/scripts/preview/serve.py --command "render pdf" --input tests/fixtures/sales.csv --format pdf
 ```

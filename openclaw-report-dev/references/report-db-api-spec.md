@@ -42,3 +42,16 @@
 - `EX_EXPORT_FAILED`
 - `RV_REVIEW_REQUIRED`
 - `AC_PERMISSION_DENIED`
+
+
+## 5) P1 API facade (implemented in scaffold)
+- `reports.create`
+- `renders.create`
+- `artifacts.get`
+- P1 API facade: reports.create / renders.create / artifacts.get
+
+
+## 6) P1 deterministic command parsing
+- `create report` -> `reports.create`
+- `render json|xlsx|pdf` -> `renders.create`
+- `download artifact` -> `artifacts.get`

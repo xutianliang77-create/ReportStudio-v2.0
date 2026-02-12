@@ -9,6 +9,10 @@
 - [x] P1-501 ~ P1-502 Dispatch & E2E（`reportstudio/p1/dispatch.py`, `reportstudio/scripts/report/create.py`）
 - [x] Added tests for ingest/metrics/e2e pipeline (`tests/test_p1_pipeline.py`)
 - [x] Add dedicated download metadata helper (`reportstudio/scripts/export/download.py`)
+- [x] P1-601 ~ P1-603 API（reports/renders/artifacts）（`reportstudio/p1/api.py`, `reportstudio/scripts/preview/serve.py`）
+- [x] Added API endpoint tests (`tests/test_api_endpoints.py`)
+- [x] P1-701 命令解析（确定性）（`reportstudio/p1/command_parser.py`）
+- [x] P1-801 端到端测试（最小）（`tests/test_e2e_minimal.py`）
 
 ## Next steps
 - [ ] Upgrade ingest to support XLSX/Markdown and encoding fallback.

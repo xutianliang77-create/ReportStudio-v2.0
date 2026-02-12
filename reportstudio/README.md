@@ -17,4 +17,12 @@ python3 reportstudio/scripts/export/export.py --input tests/fixtures/sales.csv -
 python3 reportstudio/scripts/export/export.py --input tests/fixtures/sales.csv --metric-field amount --dimension-field region --format pdf
 # then use output artifact path with:
 python3 reportstudio/scripts/export/download.py --file <artifact_path>
+# API simulator endpoints:
+python3 reportstudio/scripts/preview/serve.py reports.create --input tests/fixtures/sales.csv
+python3 reportstudio/scripts/preview/serve.py renders.create --input tests/fixtures/sales.csv --format xlsx
+python3 reportstudio/scripts/preview/serve.py artifacts.get --file <artifact_path>
+# deterministic command parsing:
+python3 reportstudio/scripts/preview/serve.py --command "create report" --input tests/fixtures/sales.csv
+python3 reportstudio/scripts/preview/serve.py --command "render pdf" --input tests/fixtures/sales.csv --format pdf
+python3 reportstudio/scripts/preview/serve.py --command "download artifact" --file <artifact_path>
 ```
