@@ -1,54 +1,13 @@
 {
   "routes": [
-    {
-      "intent": "report.create",
-      "script": "scripts/report/create.py",
-      "module": "Report Pipeline"
-    },
-    {
-      "intent": "report.preview",
-      "script": "scripts/preview/serve.py",
-      "module": "Preview Studio"
-    },
-    {
-      "intent": "report.export",
-      "script": "scripts/export/export.py",
-      "module": "Export Engine"
-    },
-    {
-      "intent": "report.download",
-      "script": "scripts/export/download.py",
-      "module": "Export Engine"
-    },
-    {
-      "intent": "report.insight.generate",
-      "script": "scripts/insight/generate.py",
-      "module": "Insight Engine"
-    },
-    {
-      "intent": "report.review.submit",
-      "script": "scripts/collab/review.py",
-      "module": "Collaboration Engine"
-    },
-    {
-      "intent": "report.schedule.create",
-      "script": "scripts/scheduler/create.py",
-      "module": "Scheduler Engine"
-    },
-    {
-      "intent": "report.version.compare",
-      "script": "scripts/version/diff.py",
-      "module": "Version Control"
-    },
-    {
-      "intent": "report.lineage.trace",
-      "script": "scripts/lineage/trace.py",
-      "module": "Lineage Tracker"
-    },
-    {
-      "intent": "report.permission.set",
-      "script": "scripts/workspace/permission.py",
-      "module": "Workspace & ACL"
-    }
+    {"intent": "report.create", "script": "scripts/report/create.py", "module": "Report Pipeline"},
+    {"intent": "report.preview", "script": "scripts/preview/serve.py", "module": "Preview Studio"},
+    {"intent": "report.export", "script": "scripts/export/export.py", "module": "Export Engine"},
+    {"intent": "report.insight.generate", "script": "scripts/insight/generate.py", "module": "Insight Engine"},
+    {"intent": "report.review.submit", "script": "scripts/collab/review.py", "module": "Collaboration Engine"},
+    {"intent": "report.schedule.create", "script": "scripts/scheduler/create.py", "module": "Scheduler Engine"},
+    {"intent": "report.version.compare", "script": "scripts/version/diff.py", "module": "Version Control"},
+    {"intent": "report.lineage.trace", "script": "scripts/lineage/trace.py", "module": "Lineage Tracker"},
+    {"intent": "report.permission.set", "script": "scripts/workspace/permission.py", "module": "Workspace & ACL"}
   ]
 }

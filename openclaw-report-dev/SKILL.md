@@ -1,6 +1,6 @@
 ---
 name: openclaw-report-dev
-description: Build and iterate OpenClaw ReportStudio v2.0 solutions end-to-end: requirement clarification, 14-module capability mapping, intent-to-script routing, technical design (architecture/DB/API/security/performance), implementation planning, and delivery validation. Use when users ask to create or revise report platforms, implement report pipelines, define/report intents, troubleshoot report workflows, or produce reusable report specs and engineering handoff artifacts, including report creation, analysis, export and download workflows.
+description: Build and iterate OpenClaw ReportStudio v2.0 solutions end-to-end: requirement clarification, 14-module capability mapping, intent-to-script routing, technical design (architecture/DB/API/security/performance), implementation planning, and delivery validation. Use when users ask to create or revise report platforms, implement report pipelines, define/report intents, troubleshoot report workflows, or produce reusable report specs and engineering handoff artifacts.
 ---
 
 # OpenClaw ReportStudio v2.0 Skill
@@ -44,7 +44,6 @@ Always output sections in this sequence:
 ## Routing and Implementation Rules
 
 - Route each actionable request to a clear intent and script path.
-- Ensure report creation/analysis/export/download flows are all covered by intents and scripts.
 - Keep skill docs and scaffold code aligned.
 - If adding or changing intents, update both:
   - `openclaw-report-dev/references/report-intent-catalog.md`

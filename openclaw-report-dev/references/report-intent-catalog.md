@@ -10,7 +10,6 @@
 - `report.update`
 - `report.explain`
 - `report.export`
-- `report.download`
 
 ## 模板
 - `report.template.save`
