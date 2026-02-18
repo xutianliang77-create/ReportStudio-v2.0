@@ -20,7 +20,9 @@ from reportstudio.workers.queue import enqueue_render_job, queue_backend
 SUPPORTED_QUEUE_EXPORT_FORMATS = frozenset({"pdf", "xlsx", "json"})
 
 
-def _normalize_export_format(fmt: str) -> str:
+def _normalize_export_format(fmt: str | None) -> str:
+    if not isinstance(fmt, str):
+        return ""
     return fmt.strip().lower()
 
 
