@@ -1,60 +1,59 @@
 ---
 name: openclaw-report-dev
-description: Design and implement OpenClaw ReportStudio workflows with executable routing and verifiable outputs. Use when users ask for report creation, analysis, preview editing, render/export/download, ACL/security, masking, versioning, scheduling, or troubleshooting report pipelines. This skill is for engineering-ready plan + scaffold implementation alignment, covering both design and executable delivery.
+description: Build and iterate OpenClaw ReportStudio workflows with engineering-ready outputs. Use for report create/analyze/preview/render/export/download capabilities, intent routing, ACL/security/masking, versioning, scheduling, and scaffold troubleshooting. This skill requires design + implementation alignment (not design-only docs).
 ---
 
 # OpenClaw ReportStudio v2.0 Skill
 
-Use this skill when the task needs **可实现、可测试、可交付**的报表能力（设计与实现并重）对齐。
+本 skill 用于把“报表需求”转换为**可实现、可测试、可交付**的结果。
 
-## Skill Positioning
+## 1) 适用范围（What to use this for）
 
-- 本 skill 面向 OpenClaw 的报表能力研发与迭代。
-- 输出必须同时覆盖（消除“只写方案”与“只写代码”的冲突）：
-  - 业务方案（目标、场景、验收）
-  - 技术方案（路由、数据结构、API、安全、性能）
-  - 代码落地（脚手架改动、测试、可验证结果）
-- 对于“报表制作、分析、下载/导出”相关需求，必须给出可执行路径，而不是仅概念描述。
+优先用于以下任务：
 
-## Current Scaffold Capability Focus (align with repository)
+- 报表制作、分析、预览、渲染、导出、下载流程设计与实现。
+- Intent 路由设计、脚手架代码变更、测试补齐。
+- 安全能力：ACL/RBAC、脱敏、审计日志。
+- 版本能力：report/template 版本、回滚、可追溯变更。
+- 现有流程排障与一致性修复（文档-代码-测试三者一致）。
 
-在当前仓库实现语义下，优先按以下能力组织回答与变更：
+## 2) 当前仓库能力焦点（Align with scaffold）
 
-1. Report/Render 基础流程（create/render/get）
+按以下能力优先映射与交付：
+
+1. Report / Render 基础流程（create/render/get）
 2. Preview Session（create/get/patch/replay）
-3. Export 能力（json/xlsx/pdf/docx）
-4. Artifact 下载与签名链接
-5. ACL/RBAC 与鉴权拒绝码（E4001/E4002）
-6. 脱敏（masking）与审计日志
-7. 版本管理与回滚（report/template）
+3. Export（json/xlsx/pdf/docx）与 Artifact 下载
+4. ACL/RBAC（E4001/E4002）
+5. Masking 与审计日志
+6. 版本管理与回滚（report/template）
 
-## Execution Workflow
+## 3) 执行顺序（Execution workflow）
 
-按以下顺序执行：
+1. Clarify Scope
+   - 明确目标、输入输出、约束、验收标准。
+2. Map to Modules + Intents
+   - 映射模块、路由、脚本入口。
+3. Design + Implement Together
+   - 方案与代码同步，不做“只写文档”或“只改代码”。
+4. Validate
+   - 运行对应测试与必要检查。
+5. Deliver
+   - 输出变更摘要、验证结果、风险与后续项。
 
-1. **Clarify Scope**
-   - 明确目标能力、输入输出、是否涉及 API/路由/数据模型。
-2. **Map to Modules + Intents**
-   - 将需求映射到模块、路由和脚本入口。
-3. **Design + Implement Together**
-   - 文档与代码同步更新，避免“文档说有、代码没有”。
-4. **Validate**
-   - 至少运行对应测试与必要静态检查。
-5. **Deliver**
-   - 输出改动摘要、测试结果、风险与后续项。
+## 4) 强制工程规则（Must follow）
 
-## Mandatory Engineering Rules
-
-- Keep skill docs and implementation scaffold in sync.
-- 当新增/修改 intent 时，必须同时更新：
+- Keep skill documentation and implementation scaffold in sync.
+- 变更 Intent 时，必须同步更新：
   - `openclaw-report-dev/references/report-intent-catalog.md`
   - `reportstudio/config/intent_routes.json`
-- 优先小而可测的 Python 模块（`reportstudio/` 下）。
-- 路由或校验行为变更必须补测试（`tests/`）。
-- 导出类能力应复用中间产物，禁止导出阶段重算上游 pipeline。
-- 安全相关能力（ACL/脱敏/下载）必须有错误码与审计日志。
+- 优先小而可测的 Python 模块（`reportstudio/`）。
+- 路由/校验行为变更必须补测试（`tests/`）。
+- 导出流程应复用中间产物，禁止导出阶段重算上游 pipeline。
+- 安全相关能力必须给出错误码与审计日志。
+- 技能内容改动后需重新打包 `openclaw-report-dev.skill`。
 
-## Required Output Contract
+## 5) 默认交付结构（Output contract）
 
 每次交付默认按以下结构输出：
 
@@ -65,7 +64,7 @@ Use this skill when the task needs **可实现、可测试、可交付**的报�
 5. Validation (tests/checks)
 6. Risks / Open Questions
 
-## Resource Loading (load on demand)
+## 6) 参考资料按需加载（Load on demand）
 
 - Intent catalog: `references/report-intent-catalog.md`
 - DB/API spec: `references/report-db-api-spec.md`
@@ -75,4 +74,4 @@ Use this skill when the task needs **可实现、可测试、可交付**的报�
 - Acceptance checklist: `references/report-acceptance-checklist.md`
 - Delivery template: `assets/report-design-spec-template.md`
 
-仅加载当前任务需要的文件，避免无关上下文膨胀。
+仅加载当前任务所需文件，避免上下文膨胀。
