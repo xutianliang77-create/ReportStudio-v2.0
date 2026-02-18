@@ -64,6 +64,25 @@ class ACLEnforcementIntegrationTests(unittest.TestCase):
         self.assertEqual(denied["code"], 403)
         self.assertEqual(denied["error_code"], "E4002")
 
+    def test_cancel_render_missing_principal_returns_e4001(self):
+        report = create_report_route(
+            CreateReportDTO(name="acl-cancel-missing-principal", spec={"input_path": "tests/fixtures/sales.csv"}),
+            principal_id="owner_u1",
+        )
+        report_id = report["data"]["report"]["report_id"]
+
+        created = create_render(
+            input_path="tests/fixtures/sales.csv",
+            fmt="pdf",
+            report_id=report_id,
+            principal_id="owner_u1",
+        )
+        render_id = created["data"]["render"]["render_id"]
+
+        denied = cancel_render(render_id)
+        self.assertEqual(denied["code"], 403)
+        self.assertEqual(denied["error_code"], "E4001")
+
     def test_acl_allows_view_and_manage_when_policy_granted(self):
         report = create_report_route(
             CreateReportDTO(name="acl-view", spec={"input_path": "tests/fixtures/sales.csv"}),
