@@ -79,7 +79,7 @@ class ACLEnforcementIntegrationTests(unittest.TestCase):
         )
         render_id = created["data"]["render"]["render_id"]
 
-        denied = cancel_render(render_id)
+        denied = cancel_render(render_id, principal_id=None)
         self.assertEqual(denied["code"], 403)
         self.assertEqual(denied["error_code"], "E4001")
 
