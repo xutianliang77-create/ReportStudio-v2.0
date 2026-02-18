@@ -112,7 +112,7 @@ def export_report(snapshot: dict, out_dir: Path, report_name: str = "report", fm
         raise ValueError(f"Unsupported export format: {fmt}")
 
     stamp = _utc_stamp()
-    unique_id = uuid4().hex[:8]
+    unique_id = uuid4().hex
     target = out_dir / f"{report_name}_{stamp}_{unique_id}.{fmt}"
 
     if fmt == "json":
