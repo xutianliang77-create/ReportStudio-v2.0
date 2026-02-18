@@ -52,6 +52,7 @@ def process_render_job(render_id: str) -> dict:
             out_dir=Path("reportstudio/data/artifacts"),
             report_name="render",
             fmt=job.fmt,
+            artifact_id=render_id,
         )
 
         # upload: in scaffold treated as artifact registration/delivery writeback

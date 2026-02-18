@@ -105,14 +105,20 @@ def _write_pdf(snapshot: dict, target: Path) -> None:
     target.write_bytes(pdf.encode("latin-1", errors="ignore"))
 
 
-def export_report(snapshot: dict, out_dir: Path, report_name: str = "report", fmt: str = "json") -> dict:
+def export_report(
+    snapshot: dict,
+    out_dir: Path,
+    report_name: str = "report",
+    fmt: str = "json",
+    artifact_id: str | None = None,
+) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     fmt = fmt.lower()
     if fmt not in {"json", "xlsx", "pdf"}:
         raise ValueError(f"Unsupported export format: {fmt}")
 
     stamp = _utc_stamp()
-    unique_id = uuid4().hex
+    unique_id = artifact_id or uuid4().hex
     target = out_dir / f"{report_name}_{stamp}_{unique_id}.{fmt}"
 
     if fmt == "json":
