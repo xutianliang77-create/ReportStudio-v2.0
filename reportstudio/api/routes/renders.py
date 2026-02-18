@@ -124,7 +124,18 @@ def export_render_docx(
         }
 
 
-def cancel_render(render_id: str) -> dict:
+def cancel_render(render_id: str, *, principal_id: str = "owner") -> dict:
+    base_job = get_job(render_id)
+    try:
+        enforce_acl(
+            resource_type="report",
+            resource_id=base_job.report_id,
+            principal_id=principal_id,
+            actions_any={"render", "manage"},
+        )
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
     job = cancel_job(render_id)
     return {
         "code": 200,
@@ -145,7 +156,19 @@ def retry_render(
     fmt: str | None = None,
     metric_field: str | None = None,
     dimension_field: str | None = None,
+    principal_id: str = "owner",
 ) -> dict:
+    base_job = get_job(render_id)
+    try:
+        enforce_acl(
+            resource_type="report",
+            resource_id=base_job.report_id,
+            principal_id=principal_id,
+            actions_any={"render", "manage"},
+        )
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
     retry_job = retry_failed_job(
         render_id,
         input_path=input_path,
@@ -170,7 +193,18 @@ def retry_render(
     }
 
 
-def get_render(render_id: str) -> dict:
+def get_render(render_id: str, *, principal_id: str = "owner") -> dict:
+    base_job = get_job(render_id)
+    try:
+        enforce_acl(
+            resource_type="report",
+            resource_id=base_job.report_id,
+            principal_id=principal_id,
+            actions_any={"view", "render", "manage"},
+        )
+    except ACLDeniedError as exc:
+        return acl_error_response(exc)
+
     job = get_job(render_id)
     return {
         "code": 200,

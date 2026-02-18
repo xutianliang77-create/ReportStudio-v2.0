@@ -2,7 +2,7 @@ import unittest
 
 from reportstudio.api.routes.acl import UpsertACLPolicyDTO, upsert_acl_policy_route
 from reportstudio.api.routes.artifacts import sign_artifact_route
-from reportstudio.api.routes.renders import create_render
+from reportstudio.api.routes.renders import cancel_render, create_render
 from reportstudio.api.routes.reports import CreateReportDTO, create_report_route, get_report_route
 from reportstudio.api.routes.templates import CreateTemplateDTO, TemplateSpecDTO, create_template_route, get_template_route
 from reportstudio.core.security import acl as acl_service
@@ -44,6 +44,25 @@ class ACLEnforcementIntegrationTests(unittest.TestCase):
 
         deny_logs = acl_service.list_audit_logs("acl.deny")
         self.assertGreaterEqual(len(deny_logs), 1)
+
+    def test_cancel_render_without_permission_returns_e4002(self):
+        report = create_report_route(
+            CreateReportDTO(name="acl-cancel", spec={"input_path": "tests/fixtures/sales.csv"}),
+            principal_id="owner_u1",
+        )
+        report_id = report["data"]["report"]["report_id"]
+
+        created = create_render(
+            input_path="tests/fixtures/sales.csv",
+            fmt="pdf",
+            report_id=report_id,
+            principal_id="owner_u1",
+        )
+        render_id = created["data"]["render"]["render_id"]
+
+        denied = cancel_render(render_id, principal_id="user_u2")
+        self.assertEqual(denied["code"], 403)
+        self.assertEqual(denied["error_code"], "E4002")
 
     def test_acl_allows_view_and_manage_when_policy_granted(self):
         report = create_report_route(
