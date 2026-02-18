@@ -10,6 +10,9 @@ import json
 import zipfile
 
 
+SUPPORTED_EXPORT_FORMATS = frozenset({"json", "xlsx", "pdf"})
+
+
 def _utc_stamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 
@@ -114,7 +117,7 @@ def export_report(
 ) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     fmt = fmt.lower()
-    if fmt not in {"json", "xlsx", "pdf"}:
+    if fmt not in SUPPORTED_EXPORT_FORMATS:
         raise ValueError(f"Unsupported export format: {fmt}")
 
     stamp = _utc_stamp()
