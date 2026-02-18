@@ -36,7 +36,7 @@ def _resolve_render_request_id(render_request_id: str | None, headers: dict[str,
 
 def create_render(
     input_path: str,
-    fmt: str | None = "pdf",
+    fmt: object | None = "pdf",
     metric_field: str = "amount",
     dimension_field: str = "region",
     workspace_id: str = "default-workspace",
