@@ -36,7 +36,7 @@ def create_render(
     headers: dict[str, str] | None = None,
     principal_id: str = "owner",
 ) -> dict:
-    if fmt not in {"pdf", "xlsx", "json", "docx"}:
+    if fmt not in {"pdf", "xlsx", "json"}:
         return {
             "code": 400,
             "message": "unsupported format",
