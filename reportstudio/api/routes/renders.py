@@ -20,7 +20,7 @@ from reportstudio.workers.queue import enqueue_render_job, queue_backend
 SUPPORTED_QUEUE_EXPORT_FORMATS = frozenset({"pdf", "xlsx", "json"})
 
 
-def _normalize_export_format(fmt: str | None) -> str:
+def _normalize_export_format(fmt: object | None) -> str:
     if not isinstance(fmt, str):
         return ""
     return fmt.strip().lower()
@@ -36,7 +36,7 @@ def _resolve_render_request_id(render_request_id: str | None, headers: dict[str,
 
 def create_render(
     input_path: str,
-    fmt: str = "pdf",
+    fmt: str | None = "pdf",
     metric_field: str = "amount",
     dimension_field: str = "region",
     workspace_id: str = "default-workspace",
