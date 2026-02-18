@@ -118,7 +118,8 @@ def export_report(
         raise ValueError(f"Unsupported export format: {fmt}")
 
     stamp = _utc_stamp()
-    unique_id = artifact_id or uuid4().hex
+    random_suffix = uuid4().hex
+    unique_id = f"{artifact_id}_{random_suffix}" if artifact_id else random_suffix
     target = out_dir / f"{report_name}_{stamp}_{unique_id}.{fmt}"
 
     if fmt == "json":
