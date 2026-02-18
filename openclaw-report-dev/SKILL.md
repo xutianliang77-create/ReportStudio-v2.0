@@ -1,16 +1,16 @@
 ---
 name: openclaw-report-dev
-description: Design and implement OpenClaw ReportStudio workflows with executable routing and verifiable outputs. Use when users ask for report creation, analysis, preview editing, render/export/download, ACL/security, masking, versioning, scheduling, or troubleshooting report pipelines. This skill is for engineering-ready plan + scaffold implementation alignment (not only high-level product copy).
+description: Design and implement OpenClaw ReportStudio workflows with executable routing and verifiable outputs. Use when users ask for report creation, analysis, preview editing, render/export/download, ACL/security, masking, versioning, scheduling, or troubleshooting report pipelines. This skill is for engineering-ready plan + scaffold implementation alignment, covering both design and executable delivery.
 ---
 
 # OpenClaw ReportStudio v2.0 Skill
 
-Use this skill when the task needs **可实现、可测试、可交付**的报表能力设计与实现对齐。
+Use this skill when the task needs **可实现、可测试、可交付**的报表能力（设计与实现并重）对齐。
 
 ## Skill Positioning
 
 - 本 skill 面向 OpenClaw 的报表能力研发与迭代。
-- 输出必须同时覆盖：
+- 输出必须同时覆盖（消除“只写方案”与“只写代码”的冲突）：
   - 业务方案（目标、场景、验收）
   - 技术方案（路由、数据结构、API、安全、性能）
   - 代码落地（脚手架改动、测试、可验证结果）
