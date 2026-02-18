@@ -17,6 +17,13 @@ from reportstudio.core.security.acl import ACLDeniedError
 from reportstudio.workers.queue import enqueue_render_job, queue_backend
 
 
+SUPPORTED_QUEUE_EXPORT_FORMATS = frozenset({"pdf", "xlsx", "json"})
+
+
+def _normalize_export_format(fmt: str) -> str:
+    return fmt.strip().lower()
+
+
 def _resolve_render_request_id(render_request_id: str | None, headers: dict[str, str] | None) -> str | None:
     if render_request_id:
         return render_request_id
@@ -36,7 +43,8 @@ def create_render(
     headers: dict[str, str] | None = None,
     principal_id: str = "owner",
 ) -> dict:
-    if fmt not in {"pdf", "xlsx", "json"}:
+    fmt = _normalize_export_format(fmt)
+    if fmt not in SUPPORTED_QUEUE_EXPORT_FORMATS:
         return {
             "code": 400,
             "message": "unsupported format",
