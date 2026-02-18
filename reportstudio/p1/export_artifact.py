@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from uuid import uuid4
 from pathlib import Path
 import hashlib
 import json
@@ -111,7 +112,8 @@ def export_report(snapshot: dict, out_dir: Path, report_name: str = "report", fm
         raise ValueError(f"Unsupported export format: {fmt}")
 
     stamp = _utc_stamp()
-    target = out_dir / f"{report_name}_{stamp}.{fmt}"
+    unique_id = uuid4().hex[:8]
+    target = out_dir / f"{report_name}_{stamp}_{unique_id}.{fmt}"
 
     if fmt == "json":
         _write_json(snapshot, target)
