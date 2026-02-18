@@ -138,7 +138,7 @@ def export_render_docx(
         }
 
 
-def cancel_render(render_id: str, *, principal_id: str = "owner") -> dict:
+def cancel_render(render_id: str, *, principal_id: str | None = None) -> dict:
     base_job = get_job(render_id)
     try:
         enforce_acl(

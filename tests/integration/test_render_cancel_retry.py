@@ -17,7 +17,7 @@ class RenderCancelRetryTests(unittest.TestCase):
         created = create_render(input_path="tests/fixtures/sales.csv", fmt="pdf")
         render_id = created["data"]["render"]["render_id"]
 
-        canceled = cancel_render(render_id)
+        canceled = cancel_render(render_id, principal_id="owner")
         self.assertEqual(canceled["data"]["render"]["status"], "canceled")
 
         processed = process_next_local_job()
