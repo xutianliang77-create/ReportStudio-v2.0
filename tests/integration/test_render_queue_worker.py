@@ -19,7 +19,9 @@ class RenderQueueWorkerTests(unittest.TestCase):
 
         status = get_render(render_id)
         self.assertEqual(status["data"]["render"]["status"], "succeeded")
-        self.assertTrue(status["data"]["render"]["artifact_file"].endswith(".pdf"))
+        artifact_file = status["data"]["render"]["artifact_file"]
+        self.assertTrue(artifact_file.endswith(".pdf"))
+        self.assertIn(render_id, artifact_file)
 
     def test_async_render_job_failed_writes_error_and_audit(self):
         created = create_render(input_path="tests/fixtures/not_found.csv", fmt="xlsx")
