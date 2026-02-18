@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from reportstudio.api.deps import acl_error_response, enforce_acl
+from reportstudio.p1.export_artifact import SUPPORTED_EXPORT_FORMATS
 from reportstudio.core.export.artifact_service import ExportDocxError, export_docx_artifact
 from reportstudio.core.render.job_service import (
     cancel_job,
@@ -17,7 +18,7 @@ from reportstudio.core.security.acl import ACLDeniedError
 from reportstudio.workers.queue import enqueue_render_job, queue_backend
 
 
-SUPPORTED_QUEUE_EXPORT_FORMATS = frozenset({"pdf", "xlsx", "json"})
+SUPPORTED_QUEUE_EXPORT_FORMATS = SUPPORTED_EXPORT_FORMATS
 
 
 def _normalize_export_format(fmt: str) -> str:
