@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from reportstudio.api.deps import acl_error_response, enforce_acl
-from reportstudio.p1.export_artifact import SUPPORTED_EXPORT_FORMATS
 from reportstudio.core.export.artifact_service import ExportDocxError, export_docx_artifact
 from reportstudio.core.render.job_service import (
     cancel_job,
@@ -49,9 +48,12 @@ def create_render(
 ) -> dict:
     fmt = _normalize_export_format(fmt)
     if fmt not in SUPPORTED_QUEUE_EXPORT_FORMATS:
+        message = "unsupported format"
+        if fmt == "docx":
+            message = "docx render is not supported in queue; use export_render_docx after render succeeds"
         return {
             "code": 400,
-            "message": "unsupported format",
+            "message": message,
             "error_code": "E3003",
             "data": {},
         }
