@@ -18,7 +18,10 @@ from reportstudio.core.security.acl import ACLDeniedError
 from reportstudio.workers.queue import enqueue_render_job, queue_backend
 
 
-SUPPORTED_QUEUE_EXPORT_FORMATS = SUPPORTED_EXPORT_FORMATS
+# Worker render pipeline currently supports JSON/XLSX/PDF only.
+# Keep this allow-list explicit so adding a new export format (for example,
+# DOCX direct export) does not automatically become a queued render format.
+SUPPORTED_QUEUE_EXPORT_FORMATS = frozenset({"json", "xlsx", "pdf"})
 
 
 def _normalize_export_format(fmt: str) -> str:
